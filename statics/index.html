@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Me-API Playground</title>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 id="user-name" class="text-4xl font-bold mb-2 text-blue-600">Loading Profile...</h1>
+        <p id="user-email" class="text-gray-600 mb-6"></p>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4">Search Projects by Skill</h2>
+            <div class="flex gap-2">
+                <input id="skill-input" type="text" placeholder="e.g. Python" class="border p-2 flex-grow rounded">
+                <button onclick="searchProjects()" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+            </div>
+        </div>
+
+        <div id="projects-list" class="space-y-4">
+            </div>
+    </div>
+
+    <script>
+        async function loadProfile() {
+            const res = await fetch('/profile');
+            const data = await res.json();
+            document.getElementById('user-name').innerText = data.name;
+            document.getElementById('user-email').innerText = data.email;
+        }
+
+        async function searchProjects() {
+            const skill = document.getElementById('skill-input').value;
+            const res = await fetch(`/projects?skill=${skill}`);
+            const projects = await res.json();
+            const list = document.getElementById('projects-list');
+            list.innerHTML = projects.map(p => `
+                <div class="bg-white p-4 rounded shadow">
+                    <h3 class="font-bold text-lg">${p.title}</h3>
+                    <p class="text-gray-600">${p.description}</p>
+                    <div class="mt-2 text-sm text-blue-500">${p.skills_used.join(', ')}</div>
+                </div>
+            `).join('');
+        }
+        loadProfile();
+        searchProjects(); // Load all initially
+    </script>
+</body>
+</html>
